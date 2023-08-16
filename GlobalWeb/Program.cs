@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using GlobalWeb.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<GlobalWebContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("GlobalWebContext") ?? throw new InvalidOperationException("Connection string 'GlobalWebContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

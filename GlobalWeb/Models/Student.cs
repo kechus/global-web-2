@@ -9,5 +9,6 @@
         public string RegisterNumber { get; set; }
         public string Carrer { get; set; }
         public string ProfilePic { get; set; }
+        public bool IsDeleted { get; set; } = false; 
     }
 }
