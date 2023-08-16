@@ -10,6 +10,8 @@ using GlobalWeb.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace GlobalWeb.Controllers
 {
@@ -55,11 +57,28 @@ namespace GlobalWeb.Controllers
         }
 
 
+        static string CalculateMD5Hash(string input)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    builder.Append(hashBytes[i].ToString("x2")); // Convert byte to hexadecimal string
+                }
+
+                return builder.ToString();
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> LoginView([Bind("Id,Email,Password,Role,IsDeleted")] LoginUser loginUser)
         {
             var foundUser = await _context.LoginUser
-                .FirstOrDefaultAsync(m => m.Email == loginUser.Email && m.Password == loginUser.Password);
+                .FirstOrDefaultAsync(m => m.Email == loginUser.Email && m.Password == CalculateMD5Hash(loginUser.Password));
 
             if (null == foundUser)
             {
@@ -98,6 +117,7 @@ namespace GlobalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
+                loginUser.Password = CalculateMD5Hash(loginUser.Password);
                 _context.Add(loginUser);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
