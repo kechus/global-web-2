@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GlobalWeb.Data;
 using GlobalWeb.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace GlobalWeb.Controllers
 {
@@ -58,12 +61,26 @@ namespace GlobalWeb.Controllers
             var foundUser = await _context.LoginUser
                 .FirstOrDefaultAsync(m => m.Email == loginUser.Email && m.Password == loginUser.Password);
 
-           if(null == foundUser)
+            if (null == foundUser)
             {
                 return Problem("User not found");
             } 
-            
-            return RedirectToAction("Index"); 
+
+            List<Claim> c = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Email, foundUser.Email),
+                new Claim(ClaimTypes.Role, foundUser.Role)
+            };
+            ClaimsIdentity ci = new(c, CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticationProperties p = new();
+
+            p.AllowRefresh = true;
+            p.IsPersistent = true;
+
+            p.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(ci), p);
+
+            return RedirectToAction("Index", "Students"); 
         }
 
         public IActionResult LoginView()

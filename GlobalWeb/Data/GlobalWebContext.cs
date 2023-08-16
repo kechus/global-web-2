@@ -15,5 +15,9 @@ namespace GlobalWeb.Data
         }
 
         public DbSet<GlobalWeb.Models.LoginUser> LoginUser { get; set; } = default!;
+
+        public DbSet<GlobalWeb.Models.Student>? Student { get; set; }
+
+        public DbSet<GlobalWeb.Models.Course>? Course { get; set; }
     }
 }
