@@ -7,6 +7,6 @@
         public string Period { get; set; }
         public string TeacherName { get; set; }
         public int PartialsName { get; set; }
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }

@@ -102,6 +102,12 @@ namespace GlobalWeb.Controllers
             return RedirectToAction("Index", "Students"); 
         }
 
+        public async Task<IActionResult> Salir()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("LoginView");
+        }
+
         public IActionResult LoginView()
         {
             return View();
@@ -157,6 +163,7 @@ namespace GlobalWeb.Controllers
             {
                 try
                 {
+                    loginUser.Password = CalculateMD5Hash(loginUser.Password);
                     _context.Update(loginUser);
                     await _context.SaveChangesAsync();
                 }

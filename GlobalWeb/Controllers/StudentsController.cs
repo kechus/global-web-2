@@ -24,8 +24,12 @@ namespace GlobalWeb.Controllers
         public async Task<IActionResult> Index()
         {
             var roles = HttpContext.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            ViewData["Role"] = roles.First();
+            ViewData["IsAdmin"] = roles.First() == "Admin";
+
             return _context.Student != null ? 
-                          View(await _context.Student.ToListAsync()) :
+                          View(await _context.Student.Where(student=>student.IsDeleted == false) .ToListAsync()) :
                           Problem("Entity set 'GlobalWebContext.Student'  is null.");
         }
 
@@ -150,7 +154,8 @@ namespace GlobalWeb.Controllers
             var student = await _context.Student.FindAsync(id);
             if (student != null)
             {
-                _context.Student.Remove(student);
+                student.IsDeleted = true;
+                _context.Student.Update(student);
             }
             
             await _context.SaveChangesAsync();

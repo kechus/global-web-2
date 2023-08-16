@@ -23,7 +23,7 @@ namespace GlobalWeb.Controllers
         public async Task<IActionResult> Index()
         {
               return _context.Course != null ? 
-                          View(await _context.Course.ToListAsync()) :
+                          View(await _context.Course.Where(course=>course.IsDeleted == false).ToListAsync()) :
                           Problem("Entity set 'GlobalWebContext.Course'  is null.");
         }
 
@@ -148,7 +148,8 @@ namespace GlobalWeb.Controllers
             var course = await _context.Course.FindAsync(id);
             if (course != null)
             {
-                _context.Course.Remove(course);
+                course.IsDeleted = true;
+                _context.Update(course);
             }
             
             await _context.SaveChangesAsync();

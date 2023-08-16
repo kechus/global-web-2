@@ -9,6 +9,18 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+@if ((bool)ViewData["IsAdmin"])
+{
+    <h2 style="color: red;"> @ViewData["Role"] </h2>
+}
+else
+{
+    <h2 style="color: green;"> @ViewData["Role"] </h2>    
+}
+
+
+
 <table class="table">
     <thead>
         <tr>
@@ -55,7 +67,7 @@
                 @Html.DisplayFor(modelItem => item.Carrer)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ProfilePic)
+                <img src="@Url.Content(item.ProfilePic)" width="200" height="150" />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IsDeleted)
